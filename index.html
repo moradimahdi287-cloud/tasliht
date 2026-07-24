@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسلیحات حوزه یک امیرالمومنین(ع)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAF3FE;
+    --bg-2:#F6FAFF;
+    --surface:#FFFFFF;
+    --surface-2:#F1F7FF;
+    --accent:#1D6FE0;
+    --accent-dark:#0B3C8C;
+    --accent-light:#5FA0F5;
+    --text:#0F2540;
+    --muted:#5E7591;
+    --border:#DCE9FB;
+    --danger:#E5484D;
+    --danger-bg:#FDECEC;
+    --green:#1E8A4C;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:9px;
+    --shadow:0 12px 30px rgba(29,111,224,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    background:linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 340px);
+    color:var(--text);
+    min-height:100vh;
+  }
+  ::selection{ background:var(--accent); color:#fff; }
+  .fancy{ font-family:'Lalezar', 'Vazirmatn', Tahoma, sans-serif; }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 22px; background:linear-gradient(90deg, var(--accent-dark), var(--accent));
+    position:sticky; top:0; z-index:30; gap:12px; flex-wrap:wrap;
+    box-shadow:0 4px 18px rgba(11,60,140,0.25);
+  }
+  .topbar-right{ display:flex; align-items:center; gap:12px; min-width:0; }
+  .hamburger-btn{
+    width:42px;height:42px; border-radius:12px; border:none; background:rgba(255,255,255,0.15);
+    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .hamburger-btn:hover{ background:rgba(255,255,255,0.28); }
+  .hamburger-btn svg{ width:20px;height:20px; }
+  .site-title{ min-width:0; }
+  .site-title b{
+    display:block; font-size:19px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    line-height:1.5;
+  }
+  .site-title span{ display:block; font-size:10.5px; color:#CFE1FB; margin-top:1px; }
+
+  .topbar-left{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .icon-btn{
+    width:38px;height:38px; border-radius:10px; border:none; background:rgba(255,255,255,0.15);
+    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .icon-btn:hover{ background:rgba(255,255,255,0.28); }
+  .icon-btn svg{ width:17px;height:17px; }
+  .user-pill{
+    display:flex; align-items:center; gap:7px; padding:8px 13px; border-radius:999px;
+    background:rgba(255,255,255,0.15); font-size:12px; font-weight:700; color:#fff;
+  }
+  .user-pill svg{ width:13px;height:13px; }
+
+  /* hamburger side menu */
+  .menu-overlay{
+    position:fixed; inset:0; background:rgba(10,25,45,0.45); z-index:60; display:none;
+  }
+  .menu-overlay.open{ display:block; }
+  .side-menu{
+    position:fixed; top:0; right:0; height:100vh; width:270px; max-width:80vw;
+    background:var(--surface); z-index:61; box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+    transform:translateX(100%); transition:transform .25s ease; padding:22px 18px; display:flex; flex-direction:column; gap:8px;
+  }
+  .side-menu.open{ transform:translateX(0); }
+  .side-menu-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .side-menu-head b{ font-size:15px; }
+  .side-menu-close{ width:32px;height:32px; border-radius:8px; border:none; background:var(--surface-2); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .side-menu-item{
+    display:flex; align-items:center; gap:12px; padding:14px 14px; border-radius:var(--radius-sm);
+    background:var(--surface-2); border:1.5px solid var(--border); cursor:pointer; font-size:14px; font-weight:700; color:var(--text);
+  }
+  .side-menu-item:hover{ border-color:var(--accent); }
+  .side-menu-item.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .side-menu-item svg{ width:18px;height:18px; flex-shrink:0; }
+
+  .view{ display:none; padding:30px 22px 70px; max-width:1180px; margin:0 auto; }
+  .view.active{ display:block; }
+
+  #view-welcome{ display:none; min-height:calc(100vh - 70px); align-items:center; justify-content:center; padding:40px 22px;
+    background:radial-gradient(circle at 50% 0%, #DCEBFF 0%, transparent 60%); }
+  #view-welcome.active{ display:flex; }
+  .welcome-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:28px;
+    padding:52px 40px; text-align:center; max-width:440px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
+  }
+  .welcome-card::before{
+    content:""; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(29,111,224,0.18), transparent 70%);
+  }
+  .welcome-ring{
+    width:92px;height:92px;border-radius:50%; margin:0 auto 22px; position:relative;
+    background:linear-gradient(135deg, var(--accent), var(--accent-light));
+    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(29,111,224,0.35);
+  }
+  .welcome-ring svg{ width:42px;height:42px; stroke:#fff; }
+  .welcome-card h2{ font-size:28px; margin:0 0 10px; position:relative; color:var(--accent-dark); }
+  .welcome-card p{ color:var(--muted); font-size:13.5px; margin:0 0 30px; line-height:2; position:relative; }
+
+  .lock-overlay{
+    position:fixed; inset:0; background:linear-gradient(160deg,var(--accent-dark),var(--accent)); z-index:200;
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px;
+  }
+  .lock-card{ background:var(--surface); padding:36px; border-radius:24px; width:320px; text-align:center; box-shadow:var(--shadow); }
+  .lock-card input{ width:100%; padding:12px; border-radius:var(--radius-sm); border:1.5px solid var(--border); margin:10px 0; font-family:inherit; text-align:center; font-size:15px; background:var(--surface-2); color:var(--text); }
+  .lock-error{ color:var(--danger); font-size:12.5px; font-weight:700; min-height:16px; }
+
+  .btn{
+    padding:12px 20px; border-radius:var(--radius-sm); border:none; cursor:pointer;
+    font-family:inherit; font-weight:800; font-size:14px; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{ background:linear-gradient(90deg, var(--accent-dark), var(--accent)); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{ background:var(--surface-2); color:var(--text); border:1.5px solid var(--border); }
+  .btn-ghost:hover{ border-color:var(--accent); }
+  .btn-block{ width:100%; justify-content:center; }
+  .btn-danger{ background:var(--danger-bg); color:var(--danger); border:1.5px solid #F6C4C4; }
+  .btn-sm{ padding:8px 14px; font-size:12.5px; border-radius:8px; }
+
+  h1.page-title{ font-size:22px; font-weight:800; margin:0 0 6px; display:flex; align-items:center; gap:10px; color:var(--accent-dark); }
+  .page-sub{ color:var(--muted); font-size:13px; margin:0 0 26px; }
+
+  .item-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:20px; }
+  .item-card{
+    background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-lg);
+    overflow:hidden; cursor:pointer; transition:border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .item-card:hover{ border-color:var(--accent); transform:translateY(-4px); box-shadow:var(--shadow); }
+  .item-thumb{ width:100%; aspect-ratio:4/3; background:var(--surface-2); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .item-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .item-thumb .placeholder{ display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--muted); }
+  .item-thumb .placeholder svg{ width:36px;height:36px; stroke:var(--muted); }
+  .item-thumb .placeholder span{ font-size:11px; }
+  .item-body{ padding:16px 18px; }
+  .item-body .cat{ font-size:11px; color:var(--accent); font-weight:800; margin-bottom:4px; }
+  .item-body .name{ font-size:17px; font-weight:800; }
+  .item-body .stat-count{ font-size:11.5px; color:var(--muted); margin-top:6px; }
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty-state svg{ width:48px;height:48px; stroke:var(--muted); margin-bottom:14px; }
+
+  .detail-top{ display:flex; align-items:flex-start; gap:26px; flex-wrap:wrap; margin-bottom:28px; }
+  .detail-img{ width:360px; max-width:100%; aspect-ratio:4/3; border-radius:var(--radius-lg); background:var(--surface-2); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; box-shadow:var(--shadow); }
+  .detail-img img{ width:100%; height:100%; object-fit:cover; }
+  .detail-info{ flex:1; min-width:240px; }
+  .detail-info .cat{ font-size:12px; color:var(--accent); font-weight:800; margin-bottom:6px; }
+  .detail-info h1{ margin:0 0 12px; color:var(--accent-dark); }
+  .detail-info .desc{ color:var(--muted); font-size:13.5px; line-height:2; }
+
+  .stats-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:14px; margin-top:10px; }
+  .stat-box{ background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:16px 18px; box-shadow:0 4px 14px rgba(29,111,224,0.06); }
+  .stat-box .k{ font-size:11.5px; color:var(--muted); font-weight:700; margin-bottom:6px; display:block; }
+  .stat-box .v{ font-size:17px; font-weight:800; color:var(--accent); }
+
+  .admin-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start; }
+  @media (max-width:900px){ .admin-grid{ grid-template-columns:1fr; } }
+  .card{ background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-lg); padding:22px; margin-bottom:20px; box-shadow:0 4px 16px rgba(29,111,224,0.06); }
+  .card h3{ margin:0 0 16px; font-size:15px; font-weight:800; color:var(--accent-dark); }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  .field input[type=text], .field textarea, .field select{
+    width:100%; padding:10px 12px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+    background:var(--surface-2); color:var(--text); font-family:inherit; font-size:13.5px; outline:none;
+  }
+  .field textarea{ resize:vertical; min-height:80px; }
+  .field input:focus, .field textarea:focus{ border-color:var(--accent); }
+  .stat-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .stat-row input{ flex:1; }
+  .file-drop{ border:1.5px dashed var(--border); border-radius:var(--radius-md); padding:18px; text-align:center; background:var(--surface-2); cursor:pointer; font-size:12.5px; color:var(--muted); }
+  .file-drop:hover{ border-color:var(--accent); }
+  .file-preview{ width:100%; max-width:220px; border-radius:var(--radius-sm); margin-top:10px; display:none; }
+
+  .admin-item-row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; background:var(--surface-2); }
+  .admin-item-row img, .admin-item-row .ph{ width:44px;height:44px; border-radius:8px; object-fit:cover; background:var(--surface); flex-shrink:0; }
+  .admin-item-row .info{ flex:1; min-width:0; }
+  .admin-item-row .info b{ font-size:13px; display:block; }
+  .admin-item-row .info span{ font-size:11px; color:var(--muted); }
+  .admin-item-row .row-actions{ display:flex; gap:6px; }
+
+  .user-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; background:var(--surface-2); }
+  .user-row b{ font-size:13px; }
+  .badge{ font-size:10.5px; padding:3px 8px; border-radius:999px; font-weight:800; margin-inline-start:8px; }
+  .badge-admin{ background:var(--accent); color:#fff; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--accent-dark); border:1.5px solid var(--accent-light); color:#fff; padding:12px 20px; border-radius:999px;
+    font-size:13px; font-weight:700; box-shadow:var(--shadow); opacity:0; pointer-events:none;
+    transition:all .25s ease; z-index:100;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="lockOverlay" class="lock-overlay" style="display:none;">
+  <div class="lock-card">
+    <div id="lockLoginView">
+      <b class="fancy" style="font-size:22px; color:var(--accent-dark);">ورود به آرشیو</b>
+      <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">رمز عبور خودت رو وارد کن</div>
+      <input type="password" id="lockInput" placeholder="رمز عبور" autofocus>
+      <div class="lock-error" id="lockError"></div>
+      <button class="btn btn-primary btn-block" id="lockSubmit" type="button">ورود</button>
+    </div>
+    <div id="lockSetupView" style="display:none;">
+      <b class="fancy" style="font-size:22px; color:var(--accent-dark);">راه‌اندازی اولیه</b>
+      <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">هنوز هیچ حسابی ساخته نشده. اولین حساب (مدیر سایت) رو بساز</div>
+      <input type="text" id="setupName" placeholder="اسمت (برای پیام خوش‌آمد)">
+      <input type="password" id="setupPw1" placeholder="رمز عبور">
+      <input type="password" id="setupPw2" placeholder="تکرار رمز عبور">
+      <div class="lock-error" id="setupError"></div>
+      <button class="btn btn-primary btn-block" id="setupSubmit" type="button">ساخت حساب و ورود</button>
+    </div>
+  </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-head">
+    <b>منوی سایت</b>
+    <button class="side-menu-close" id="sideMenuClose" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="side-menu-item active" data-nav="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    صفحه اصلی
+  </div>
+  <div class="side-menu-item" data-nav="general">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+    آمار کلی
+  </div>
+  <div class="side-menu-item" data-nav="ammo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="7" rx="2"/><path d="M9 9v11a2 2 0 002 2h2a2 2 0 002-2V9"/></svg>
+    مهمات
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-right">
+    <button class="hamburger-btn" id="hamburgerBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="site-title">
+      <b class="fancy">تسلیحات حوزه یک امیرالمومنین(ع)</b>
+      <span>آرشیو تصویری و آماری</span>
+    </div>
+  </div>
+  <div class="topbar-left">
+    <span class="user-pill" id="userPill" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>
+      <span id="userPillName">—</span>
+    </span>
+    <button class="icon-btn" id="adminNavBtn" data-nav="admin" type="button" style="display:none;" title="مدیریت">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+    <button class="icon-btn" id="logoutBtn" type="button" title="خروج">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</div>
+
+<section id="view-welcome">
+  <div class="welcome-card">
+    <div class="welcome-ring"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h2 class="fancy" id="welcomeTitle">خوش اومدی</h2>
+    <p>وارد آرشیو تسلیحات شدی. از این‌جا می‌تونی همه‌ی آیتم‌ها و آمار رو مرور کنی.</p>
+    <button class="btn btn-primary btn-block" id="welcomeContinue" type="button">ورود به سایت</button>
+  </div>
+</section>
+
+<section class="view" id="view-home">
+  <h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    تسلیحات
+  </h1>
+  <p class="page-sub">روی هر کارت کلیک کن تا وارد صفحه‌ی جزئیات و آمار همون سلاح بشی.</p>
+  <div class="item-grid" id="homeGrid"></div>
+</section>
+
+<section class="view" id="view-detail">
+  <button class="btn btn-ghost" id="backToHome" type="button" style="margin-bottom:18px;">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    بازگشت
+  </button>
+  <div class="detail-top">
+    <div class="detail-img" id="detailImgWrap"></div>
+    <div class="detail-info">
+      <div class="cat" id="detailCat">—</div>
+      <h1 id="detailName">—</h1>
+      <div class="desc" id="detailDesc">—</div>
+    </div>
+  </div>
+  <h3 style="font-size:14px; color:var(--muted); margin-bottom:6px;">آمار و مشخصات</h3>
+  <div class="stats-grid" id="detailStats"></div>
+</section>
+
+<section class="view" id="view-general">
+  <h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+    آمار کلی
+  </h1>
+  <p class="page-sub">خلاصه‌ی کلی وضعیت تسلیحات.</p>
+  <div class="stats-grid" id="generalStatsView"></div>
+</section>
+
+<section class="view" id="view-ammo">
+  <h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="7" rx="2"/><path d="M9 9v11a2 2 0 002 2h2a2 2 0 002-2V9"/></svg>
+    مهمات و خشاب
+  </h1>
+  <p class="page-sub">آمار مهمات و خشاب‌ها.</p>
+  <div class="stats-grid" id="ammoStatsView"></div>
+</section>
+
+<section class="view" id="view-admin">
+  <h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    پنل مدیریت
+  </h1>
+  <p class="page-sub">آیتم‌ها، آمار کلی، آمار مهمات و حساب‌های کاربری رو از اینجا مدیریت کن.</p>
+
+  <div class="admin-grid">
+    <div>
+      <div class="card">
+        <h3 id="itemFormTitle">افزودن سلاح جدید</h3>
+        <input type="hidden" id="editItemId" value="">
+        <div class="field"><label>نام</label><input type="text" id="itemName" placeholder="مثلاً: کلاشینکف"></div>
+        <div class="field"><label>دسته‌بندی</label><input type="text" id="itemCat" placeholder="مثلاً: تفنگ خودکار"></div>
+        <div class="field"><label>توضیحات</label><textarea id="itemDesc" placeholder="توضیح کوتاه..."></textarea></div>
+        <div class="field">
+          <label>آمار و مشخصات (کلید / مقدار)</label>
+          <div id="statRows"></div>
+          <button class="btn btn-ghost btn-sm" id="addStatRow" type="button">+ افزودن ردیف آمار</button>
+        </div>
+        <div class="field">
+          <label>تصویر</label>
+          <div class="file-drop" id="fileDropZone">برای انتخاب عکس از گوشی/سیستم کلیک کن</div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none;">
+          <img id="filePreview" class="file-preview">
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn btn-primary btn-block" id="saveItemBtn" type="button">ذخیره</button>
+          <button class="btn btn-ghost" id="cancelEditBtn" type="button" style="display:none;">انصراف</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>آمار کلی</h3>
+        <div id="generalStatRows"></div>
+        <button class="btn btn-ghost btn-sm" id="addGeneralStatRow" type="button">+ افزودن ردیف</button>
+        <button class="btn btn-primary btn-block" id="saveGeneralBtn" type="button" style="margin-top:12px;">ذخیره آمار کلی</button>
+      </div>
+
+      <div class="card">
+        <h3>آمار مهمات و خشاب</h3>
+        <div id="ammoStatRows"></div>
+        <button class="btn btn-ghost btn-sm" id="addAmmoStatRow" type="button">+ افزودن ردیف</button>
+        <button class="btn btn-primary btn-block" id="saveAmmoBtn" type="button" style="margin-top:12px;">ذخیره آمار مهمات</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>لیست سلاح‌ها</h3>
+        <div id="adminItemsList"></div>
+      </div>
+
+      <div class="card" id="usersCard">
+        <h3>حساب‌های کاربری</h3>
+        <div class="field"><label>اسم</label><input type="text" id="newUserName" placeholder="اسم کاربر"></div>
+        <div class="field"><label>رمز عبور</label><input type="text" id="newUserPw" placeholder="رمز عبور"></div>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); margin-bottom:12px;">
+          <input type="checkbox" id="newUserAdmin"> دسترسی مدیر داشته باشد
+        </label>
+        <button class="btn btn-ghost btn-block" id="addUserBtn" type="button">افزودن حساب</button>
+        <div id="usersList" style="margin-top:16px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = 'https://skzgywgqvxaxymxtkaka.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_fZmIa94Ru_-CZI3z0yr7ow_m7kXZzTv';
+  var SUPABASE_TABLE = 'kv_store';
+  var K_USERS = 'ws-users';
+  var K_ITEMS = 'ws-items';
+  var K_GENERAL = 'ws-general-stats';
+  var K_AMMO = 'ws-ammo-stats';
+
+  function supabaseHeaders(extra){
+    var h = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    if (extra) for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+  var memoryStore = {};
+  var LOCAL_OK = (function(){
+    try{ if (typeof localStorage !== 'undefined'){ localStorage.setItem('__ws_t__','1'); localStorage.removeItem('__ws_t__'); return true; } }catch(e){}
+    return false;
+  })();
+  function fallbackGet(key){
+    try{ if (LOCAL_OK){ var v = localStorage.getItem('ws_' + key); return v ? JSON.parse(v) : null; } }catch(e){}
+    return memoryStore[key] !== undefined ? memoryStore[key] : null;
+  }
+  function fallbackSet(key, value){
+    try{ if (LOCAL_OK){ localStorage.setItem('ws_' + key, JSON.stringify(value)); return; } }catch(e){}
+    memoryStore[key] = value;
+  }
+  function storeGet(key){
+    return fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE + '?key=eq.' + encodeURIComponent(key) + '&select=value', { headers: supabaseHeaders() })
+      .then(function(r){ if (!r.ok) throw new Error('bad'); return r.json(); })
+      .then(function(rows){ return (rows && rows.length) ? rows[0].value : null; })
+      .catch(function(){ return fallbackGet(key); });
+  }
+  function storeSet(key, value){
+    return fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
+      method:'POST',
+      headers: supabaseHeaders({ 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates' }),
+      body: JSON.stringify([{ key:key, value:value, updated_at:new Date().toISOString() }])
+    }).then(function(r){ if(!r.ok) throw new Error('bad'); fallbackSet(key,value); return null; })
+      .catch(function(){ fallbackSet(key,value); return null; });
+  }
+
+  function simpleHash(str){ return btoa(unescape(encodeURIComponent(str || ''))); }
+  function uid(){ return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  var state = { users: [], items: [], generalStats: [], ammoStats: [], currentUser: null };
+
+  var toastTimer;
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  /* ============ Hamburger side menu ============ */
+  var menuOverlay = document.getElementById('menuOverlay');
+  var sideMenu = document.getElementById('sideMenu');
+  function openMenu(){ menuOverlay.classList.add('open'); sideMenu.classList.add('open'); }
+  function closeMenu(){ menuOverlay.classList.remove('open'); sideMenu.classList.remove('open'); }
+  document.getElementById('hamburgerBtn').addEventListener('click', openMenu);
+  document.getElementById('sideMenuClose').addEventListener('click', closeMenu);
+  menuOverlay.addEventListener('click', closeMenu);
+
+  /* ============ Views / routing ============ */
+  var views = ['home','detail','general','ammo','admin'];
+  function showView(name){
+    document.getElementById('view-welcome').classList.remove('active');
+    views.forEach(function(v){ document.getElementById('view-'+v).classList.remove('active'); });
+    document.getElementById('view-'+name).classList.add('active');
+    document.querySelectorAll('.side-menu-item').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-nav') === name);
+    });
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll('[data-nav]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var v = el.getAttribute('data-nav');
+      if (v === 'admin' && !(state.currentUser && state.currentUser.isAdmin)) return;
+      if (v === 'home') renderHome();
+      if (v === 'general') renderGeneralStatsView();
+      if (v === 'ammo') renderAmmoStatsView();
+      if (v === 'admin') renderAdmin();
+      showView(v);
+      closeMenu();
+    });
+  });
+
+  /* ============ Lock / auth ============ */
+  function showLock(mode){
+    document.getElementById('lockOverlay').style.display = 'flex';
+    if (mode === 'setup'){
+      document.getElementById('lockLoginView').style.display = 'none';
+      document.getElementById('lockSetupView').style.display = 'block';
+      document.getElementById('setupName').focus();
+    } else {
+      document.getElementById('lockSetupView').style.display = 'none';
+      document.getElementById('lockLoginView').style.display = 'block';
+      document.getElementById('lockInput').focus();
+    }
+  }
+  function hideLock(){ document.getElementById('lockOverlay').style.display = 'none'; }
+
+  document.getElementById('lockSubmit').addEventListener('click', attemptLogin);
+  document.getElementById('lockInput').addEventListener('keydown', function(ev){ if (ev.key==='Enter') attemptLogin(); });
+  function attemptLogin(){
+    var val = document.getElementById('lockInput').value;
+    var hash = simpleHash(val);
+    var match = state.users.find(function(u){ return u.passwordHash === hash; });
+    if (match){
+      state.currentUser = match;
+      hideLock();
+      document.getElementById('lockInput').value = '';
+      document.getElementById('lockError').textContent = '';
+      afterLogin();
+    } else {
+      document.getElementById('lockError').textContent = 'رمز اشتباه است';
+    }
+  }
+
+  document.getElementById('setupSubmit').addEventListener('click', attemptSetup);
+  document.getElementById('setupPw2').addEventListener('keydown', function(ev){ if (ev.key==='Enter') attemptSetup(); });
+  function attemptSetup(){
+    var name = document.getElementById('setupName').value.trim();
+    var p1 = document.getElementById('setupPw1').value;
+    var p2 = document.getElementById('setupPw2').value;
+    if (!name){ document.getElementById('setupError').textContent = 'اسم رو وارد کن'; return; }
+    if (!p1){ document.getElementById('setupError').textContent = 'رمز عبور رو وارد کن'; return; }
+    if (p1 !== p2){ document.getElementById('setupError').textContent = 'دو رمز مطابقت ندارند'; return; }
+    var newUser = { id:uid(), name:name, passwordHash:simpleHash(p1), isAdmin:true };
+    state.users.push(newUser);
+    storeSet(K_USERS, state.users).then(function(){
+      state.currentUser = newUser;
+      hideLock();
+      afterLogin();
+    });
+  }
+
+  function afterLogin(){
+    document.getElementById('userPill').style.display = 'flex';
+    document.getElementById('userPillName').textContent = state.currentUser.name;
+    document.getElementById('adminNavBtn').style.display = state.currentUser.isAdmin ? 'flex' : 'none';
+    document.getElementById('welcomeTitle').textContent = 'خوش اومدی ' + state.currentUser.name;
+    views.forEach(function(v){ document.getElementById('view-'+v).classList.remove('active'); });
+    document.getElementById('view-welcome').classList.add('active');
+  }
+
+  document.getElementById('welcomeContinue').addEventListener('click', function(){
+    renderHome();
+    showView('home');
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    state.currentUser = null;
+    document.getElementById('userPill').style.display = 'none';
+    document.getElementById('adminNavBtn').style.display = 'none';
+    views.forEach(function(v){ document.getElementById('view-'+v).classList.remove('active'); });
+    closeMenu();
+    showLock(state.users.length ? 'login' : 'setup');
+  });
+
+  /* ============ Home ============ */
+  function itemThumbHtml(item){
+    if (item.imageData) return '<img src="' + item.imageData + '" alt="">';
+    return '<div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>تصویری آپلود نشده</span></div>';
+  }
+  function renderHome(){
+    var grid = document.getElementById('homeGrid');
+    if (!state.items.length){
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><div>هنوز سلاحی اضافه نشده — از پنل مدیریت یکی اضافه کن</div></div>';
+      return;
+    }
+    var html = '';
+    state.items.forEach(function(item){
+      html += '<div class="item-card" data-id="' + item.id + '">';
+      html += '<div class="item-thumb">' + itemThumbHtml(item) + '</div>';
+      html += '<div class="item-body"><div class="cat">' + escapeHtml(item.category || '—') + '</div><div class="name">' + escapeHtml(item.name) + '</div><div class="stat-count">' + (item.stats ? item.stats.length : 0) + ' مورد آمار</div></div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll('.item-card').forEach(function(card){
+      card.addEventListener('click', function(){ renderDetail(card.getAttribute('data-id')); showView('detail'); });
+    });
+  }
+
+  /* ============ Detail ============ */
+  function renderDetail(id){
+    var item = state.items.find(function(i){ return i.id === id; });
+    if (!item) return;
+    document.getElementById('detailCat').textContent = item.category || '—';
+    document.getElementById('detailName').textContent = item.name;
+    document.getElementById('detailDesc').textContent = item.description || 'توضیحی ثبت نشده است.';
+    var imgWrap = document.getElementById('detailImgWrap');
+    imgWrap.innerHTML = item.imageData
+      ? '<img src="' + item.imageData + '" alt="">'
+      : '<div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>تصویری آپلود نشده</span></div>';
+    var statsWrap = document.getElementById('detailStats');
+    if (!item.stats || !item.stats.length){
+      statsWrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1; padding:24px;">آماری ثبت نشده است</div>';
+    } else {
+      statsWrap.innerHTML = item.stats.map(function(s){
+        return '<div class="stat-box"><span class="k">' + escapeHtml(s.k) + '</span><span class="v">' + escapeHtml(s.v) + '</span></div>';
+      }).join('');
+    }
+  }
+  document.getElementById('backToHome').addEventListener('click', function(){ renderHome(); showView('home'); });
+
+  /* ============ General / Ammo stats (public view) ============ */
+  function renderKvView(containerId, list){
+    var wrap = document.getElementById(containerId);
+    if (!list || !list.length){
+      wrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">هنوز آماری ثبت نشده است</div>';
+      return;
+    }
+    wrap.innerHTML = list.map(function(s){
+      return '<div class="stat-box"><span class="k">' + escapeHtml(s.k) + '</span><span class="v">' + escapeHtml(s.v) + '</span></div>';
+    }).join('');
+  }
+  function renderGeneralStatsView(){ renderKvView('generalStatsView', state.generalStats); }
+  function renderAmmoStatsView(){ renderKvView('ammoStatsView', state.ammoStats); }
+
+  /* ============ Admin: reusable stat-row editor ============ */
+  function addStatRowTo(containerId, k, v){
+    var wrap = document.getElementById(containerId);
+    var row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = '<input type="text" class="stat-k" placeholder="کلید (مثلاً: کالیبر)" value="' + (k? escapeHtml(k):'') + '">'
+      + '<input type="text" class="stat-v" placeholder="مقدار" value="' + (v? escapeHtml(v):'') + '">'
+      + '<button class="btn btn-danger btn-sm" type="button">حذف</button>';
+    row.querySelector('button').addEventListener('click', function(){ row.remove(); });
+    wrap.appendChild(row);
+  }
+  function collectStatRows(containerId){
+    var out = [];
+    document.querySelectorAll('#' + containerId + ' .stat-row').forEach(function(row){
+      var k = row.querySelector('.stat-k').value.trim();
+      var v = row.querySelector('.stat-v').value.trim();
+      if (k && v) out.push({ k:k, v:v });
+    });
+    return out;
+  }
+
+  document.getElementById('addStatRow').addEventListener('click', function(){ addStatRowTo('statRows'); });
+  document.getElementById('addGeneralStatRow').addEventListener('click', function(){ addStatRowTo('generalStatRows'); });
+  document.getElementById('addAmmoStatRow').addEventListener('click', function(){ addStatRowTo('ammoStatRows'); });
+
+  document.getElementById('saveGeneralBtn').addEventListener('click', function(){
+    state.generalStats = collectStatRows('generalStatRows');
+    storeSet(K_GENERAL, state.generalStats);
+    showToast('آمار کلی ذخیره شد');
+  });
+  document.getElementById('saveAmmoBtn').addEventListener('click', function(){
+    state.ammoStats = collectStatRows('ammoStatRows');
+    storeSet(K_AMMO, state.ammoStats);
+    showToast('آمار مهمات ذخیره شد');
+  });
+
+  function loadGeneralAmmoEditors(){
+    document.getElementById('generalStatRows').innerHTML = '';
+    (state.generalStats.length ? state.generalStats : [{k:'',v:''}]).forEach(function(s){ addStatRowTo('generalStatRows', s.k, s.v); });
+    document.getElementById('ammoStatRows').innerHTML = '';
+    (state.ammoStats.length ? state.ammoStats : [{k:'',v:''}]).forEach(function(s){ addStatRowTo('ammoStatRows', s.k, s.v); });
+  }
+
+  /* ============ Admin: items ============ */
+  var pendingImageData = '';
+  document.getElementById('fileDropZone').addEventListener('click', function(){ document.getElementById('fileInput').click(); });
+  document.getElementById('fileInput').addEventListener('change', function(ev){
+    var file = ev.target.files[0];
+    if (!file) return;
+    var img = new Image();
+    var reader = new FileReader();
+    reader.onload = function(e){
+      img.onload = function(){
+        var maxW = 900;
+        var scale = Math.min(1, maxW / img.width);
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        pendingImageData = canvas.toDataURL('image/jpeg', 0.75);
+        var prev = document.getElementById('filePreview');
+        prev.src = pendingImageData;
+        prev.style.display = 'block';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function resetItemForm(){
+    document.getElementById('editItemId').value = '';
+    document.getElementById('itemName').value = '';
+    document.getElementById('itemCat').value = '';
+    document.getElementById('itemDesc').value = '';
+    document.getElementById('statRows').innerHTML = '';
+    addStatRowTo('statRows'); addStatRowTo('statRows');
+    pendingImageData = '';
+    document.getElementById('filePreview').style.display = 'none';
+    document.getElementById('filePreview').src = '';
+    document.getElementById('itemFormTitle').textContent = 'افزودن سلاح جدید';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+  }
+
+  document.getElementById('saveItemBtn').addEventListener('click', function(){
+    var name = document.getElementById('itemName').value.trim();
+    if (!name){ showToast('اسم سلاح را وارد کن'); return; }
+    var cat = document.getElementById('itemCat').value.trim();
+    var desc = document.getElementById('itemDesc').value.trim();
+    var stats = collectStatRows('statRows');
+    var editId = document.getElementById('editItemId').value;
+    if (editId){
+      var existing = state.items.find(function(i){ return i.id === editId; });
+      existing.name = name; existing.category = cat; existing.description = desc; existing.stats = stats;
+      if (pendingImageData) existing.imageData = pendingImageData;
+      showToast('سلاح به‌روزرسانی شد');
+    } else {
+      state.items.push({ id:uid(), name:name, category:cat, description:desc, stats:stats, imageData: pendingImageData || '' });
+      showToast('سلاح اضافه شد');
+    }
+    storeSet(K_ITEMS, state.items);
+    resetItemForm();
+    renderAdminItemsList();
+  });
+
+  document.getElementById('cancelEditBtn').addEventListener('click', resetItemForm);
+
+  function renderAdminItemsList(){
+    var wrap = document.getElementById('adminItemsList');
+    if (!state.items.length){ wrap.innerHTML = '<div class="empty-state" style="padding:24px;">هنوز سلاحی ثبت نشده</div>'; return; }
+    wrap.innerHTML = state.items.map(function(item){
+      var thumb = item.imageData ? '<img src="' + item.imageData + '">' : '<div class="ph"></div>';
+      return '<div class="admin-item-row" data-id="' + item.id + '">' + thumb
+        + '<div class="info"><b>' + escapeHtml(item.name) + '</b><span>' + escapeHtml(item.category || '—') + '</span></div>'
+        + '<div class="row-actions"><button class="btn btn-ghost btn-sm" data-action="edit">ویرایش</button><button class="btn btn-danger btn-sm" data-action="delete">حذف</button></div></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-action="edit"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.admin-item-row').getAttribute('data-id');
+        var item = state.items.find(function(i){ return i.id === id; });
+        document.getElementById('editItemId').value = item.id;
+        document.getElementById('itemName').value = item.name;
+        document.getElementById('itemCat').value = item.category || '';
+        document.getElementById('itemDesc').value = item.description || '';
+        document.getElementById('statRows').innerHTML = '';
+        (item.stats || []).forEach(function(s){ addStatRowTo('statRows', s.k, s.v); });
+        if (!item.stats || !item.stats.length) addStatRowTo('statRows');
+        pendingImageData = '';
+        var prev = document.getElementById('filePreview');
+        if (item.imageData){ prev.src = item.imageData; prev.style.display = 'block'; } else { prev.style.display = 'none'; }
+        document.getElementById('itemFormTitle').textContent = 'ویرایش سلاح';
+        document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+        window.scrollTo(0,0);
+      });
+    });
+    wrap.querySelectorAll('[data-action="delete"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.admin-item-row').getAttribute('data-id');
+        state.items = state.items.filter(function(i){ return i.id !== id; });
+        storeSet(K_ITEMS, state.items);
+        renderAdminItemsList();
+        showToast('سلاح حذف شد');
+      });
+    });
+  }
+
+  /* ============ Admin: users ============ */
+  document.getElementById('addUserBtn').addEventListener('click', function(){
+    var name = document.getElementById('newUserName').value.trim();
+    var pw = document.getElementById('newUserPw').value;
+    var isAdmin = document.getElementById('newUserAdmin').checked;
+    if (!name || !pw){ showToast('اسم و رمز را وارد کن'); return; }
+    state.users.push({ id:uid(), name:name, passwordHash:simpleHash(pw), isAdmin:isAdmin });
+    storeSet(K_USERS, state.users);
+    document.getElementById('newUserName').value = '';
+    document.getElementById('newUserPw').value = '';
+    document.getElementById('newUserAdmin').checked = false;
+    renderUsersList();
+    showToast('حساب اضافه شد');
+  });
+  function renderUsersList(){
+    var wrap = document.getElementById('usersList');
+    wrap.innerHTML = state.users.map(function(u){
+      return '<div class="user-row" data-id="' + u.id + '"><span><b>' + escapeHtml(u.name) + '</b>' + (u.isAdmin ? '<span class="badge badge-admin">مدیر</span>' : '') + '</span>'
+        + (state.users.length > 1 ? '<button class="btn btn-danger btn-sm" data-action="del-user">حذف</button>' : '') + '</div>';
+    }).join('');
+    wrap.querySelectorAll('[data-action="del-user"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.user-row').getAttribute('data-id');
+        if (state.currentUser && state.currentUser.id === id){ showToast('نمی‌توانی حساب خودت را حذف کنی'); return; }
+        state.users = state.users.filter(function(u){ return u.id !== id; });
+        storeSet(K_USERS, state.users);
+        renderUsersList();
+      });
+    });
+  }
+
+  function renderAdmin(){
+    if (!(state.currentUser && state.currentUser.isAdmin)) return;
+    resetItemForm();
+    renderAdminItemsList();
+    renderUsersList();
+    loadGeneralAmmoEditors();
+  }
+
+  /* ============ Init ============ */
+  function init(){
+    Promise.all([ storeGet(K_USERS), storeGet(K_ITEMS), storeGet(K_GENERAL), storeGet(K_AMMO) ]).then(function(res){
+      state.users = res[0] || [];
+      state.items = res[1] || [];
+      state.generalStats = res[2] || [];
+      state.ammoStats = res[3] || [];
+      showLock(state.users.length ? 'login' : 'setup');
+    }).catch(function(){
+      showLock('setup');
+    });
+  }
+  init();
+})();
+</script>
+</body>
+</html>
