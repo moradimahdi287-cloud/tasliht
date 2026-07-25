@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه تحویل و امضای دیجیتال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --blue-900:#0B2545; --blue-700:#14428A; --blue-600:#1B5AAD; --blue-500:#2B72D6; --blue-100:#E7F0FC;
+    --bg:#EEF2F8; --surface:#FFFFFF; --surface-2:#F6F8FC; --text:#1B2434; --muted:#6B7A94; --border:#E1E7F0;
+    --danger:#E5484D; --danger-bg:#FDECEC; --green:#1E8A4C; --green-bg:#E8F7EE;
+    --radius-lg:18px; --radius-md:12px; --radius-sm:8px; --shadow:0 8px 24px rgba(15,53,104,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ font-family:'Vazirmatn', Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  ::selection{ background:var(--blue-500); color:#fff; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:16px 24px; background:var(--surface); border-bottom:1px solid var(--border); }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-badge{ width:42px;height:42px;border-radius:12px; background:var(--blue-100); display:flex; align-items:center; justify-content:center; }
+  .brand-badge svg{ width:22px;height:22px; stroke:var(--blue-600); }
+  .brand b{ font-size:15.5px; display:block; }
+  .brand span{ font-size:11px; color:var(--muted); }
+  .top-actions{ display:flex; align-items:center; gap:10px; }
+
+  .btn{ padding:12px 18px; border-radius:var(--radius-sm); border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:14px; display:inline-flex; align-items:center; gap:8px; }
+  .btn svg{ width:16px;height:16px; }
+  .btn-primary{ background:var(--blue-600); color:#fff; } .btn-primary:hover{ background:var(--blue-700); }
+  .btn-ghost{ background:var(--surface-2); color:var(--text); border:1.5px solid var(--border); } .btn-ghost:hover{ border-color:var(--blue-500); }
+  .btn-danger{ background:var(--danger-bg); color:var(--danger); border:1.5px solid #F6C4C4; }
+  .btn-green{ background:var(--green-bg); color:var(--green); border:1.5px solid #B8E6C6; }
+  .btn-block{ width:100%; justify-content:center; }
+  .btn-sm{ padding:8px 14px; font-size:12.5px; border-radius:8px; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+
+  .view{ display:none; padding:30px 20px 70px; max-width:760px; margin:0 auto; }
+  .view.active{ display:block; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:26px; margin-bottom:20px; }
+  .card h2{ margin:0 0 18px; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px; }
+  .card h2 svg{ width:18px;height:18px; stroke:var(--blue-600); }
+  .page-sub{ color:var(--muted); font-size:13px; margin:-10px 0 22px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:7px; }
+  .field input[type=text], .field input[type=password], .field textarea{
+    width:100%; padding:11px 13px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+    background:var(--surface-2); color:var(--text); font-family:inherit; font-size:14px; outline:none;
+  }
+  .field textarea{ resize:vertical; min-height:220px; line-height:2; }
+  .field input:focus, .field textarea:focus{ border-color:var(--blue-500); }
+
+  .rich-toolbar{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; padding:8px; background:var(--surface-2); border:1.5px solid var(--border); border-radius:var(--radius-sm); }
+  .rich-toolbar button{ padding:8px 12px; border-radius:7px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+  .rich-toolbar button:hover{ border-color:var(--blue-500); background:var(--blue-100); }
+  .rich-toolbar .sep{ width:1px; background:var(--border); margin:0 4px; }
+  .rich-editor{
+    width:100%; min-height:320px; padding:16px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+    background:#fff; color:#111; font-family:'Vazirmatn', Tahoma, sans-serif; font-size:14px; line-height:2.1;
+    direction:rtl; text-align:right; outline:none; overflow:auto;
+  }
+  .rich-editor:focus{ border-color:var(--blue-500); }
+  .rich-editor img{ max-width:260px; cursor:pointer; }
+  .rich-editor img.img-selected{ outline:3px solid var(--blue-500); outline-offset:2px; }
+  .rich-editor .tpl-box{ border:2px solid #333; border-radius:8px; padding:14px; margin:12px 0; }
+  .rich-editor:empty:before{ content: attr(placeholder); color:#9AA5B5; }
+  .code-input{ text-align:center; font-size:24px; font-weight:800; letter-spacing:4px; }
+
+  .info-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:20px; }
+  .info-box{ background:var(--surface-2); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; }
+  .info-box .k{ font-size:11.5px; color:var(--muted); font-weight:700; display:block; margin-bottom:5px; }
+  .info-box .v{ font-size:15px; font-weight:800; }
+
+  .stat-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .stat-row input{ flex:1; }
+
+  .person-row{ display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; background:var(--surface-2); }
+  .person-row .info{ flex:1; min-width:0; }
+  .person-row .info b{ font-size:13.5px; display:block; }
+  .person-row .info span{ font-size:11.5px; color:var(--muted); }
+  .code-chip{ font-family:monospace; font-size:13px; font-weight:800; background:var(--blue-100); color:var(--blue-700); padding:4px 10px; border-radius:6px; }
+  .row-actions{ display:flex; gap:6px; }
+
+  .sign-half{ height:calc(50vh - 60px); display:flex; flex-direction:column; padding:18px 20px; border-bottom:2px dashed var(--border); }
+  .sign-half:last-child{ border-bottom:none; }
+  .sign-half-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .sign-half-head b{ font-size:14.5px; }
+  .sign-canvas-wrap{ flex:1; border:2px dashed var(--border); border-radius:var(--radius-md); background:var(--surface); position:relative; overflow:hidden; }
+  .sign-canvas-wrap canvas{ width:100%; height:100%; touch-action:none; cursor:crosshair; }
+  .sign-hint{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12.5px; pointer-events:none; }
+  .sign-actions{ display:flex; gap:8px; margin-top:10px; }
+  .sign-confirmed{ display:none; align-items:center; gap:8px; color:var(--green); font-weight:800; font-size:13px; }
+  .sign-confirmed svg{ width:16px;height:16px; }
+
+  .archive-row{ display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; background:var(--surface-2); }
+  .archive-row .info{ flex:1; min-width:0; }
+  .archive-row .info b{ font-size:13.5px; display:block; }
+  .archive-row .info span{ font-size:11.5px; color:var(--muted); }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--blue-900); color:#fff; padding:12px 20px; border-radius:999px; font-size:13px; font-weight:700; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:all .25s ease; z-index:100; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .lock-overlay{ position:fixed; inset:0; background:var(--blue-900); z-index:200; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+  .lock-card{ background:var(--surface); padding:32px; border-radius:var(--radius-lg); width:310px; text-align:center; box-shadow:var(--shadow); }
+  .lock-card input{ width:100%; padding:12px; border-radius:var(--radius-sm); border:1.5px solid var(--border); margin:10px 0; font-family:inherit; text-align:center; font-size:15px; background:var(--surface-2); color:var(--text); }
+  .lock-error{ color:var(--danger); font-size:12.5px; font-weight:700; min-height:16px; }
+
+  .pdf-render-box{ position:fixed; left:-9999px; top:0; background:#fff; padding:26px; font-family:'Vazirmatn', Tahoma, sans-serif; direction:rtl; text-align:right; line-height:2.1; font-size:14px; color:#111; }
+  .pdf-sig-img{ max-width:180px; max-height:70px; display:block; }
+</style>
+</head>
+<body>
+
+<div id="lockOverlay" class="lock-overlay" style="display:none;">
+  <div class="lock-card">
+    <div id="lockLoginView">
+      <b style="font-size:15px;">ورود مدیر</b>
+      <input type="password" id="lockInput" placeholder="رمز عبور مدیر" autofocus>
+      <div class="lock-error" id="lockError"></div>
+      <button class="btn btn-primary btn-block" id="lockSubmit" type="button">ورود</button>
+      <button class="btn btn-ghost btn-block" id="lockCancel" type="button" style="margin-top:10px;">انصراف</button>
+    </div>
+    <div id="lockSetupView" style="display:none;">
+      <b style="font-size:15px;">راه‌اندازی اولیه پنل مدیریت</b>
+      <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">یک رمز برای پنل مدیریت تعیین کن</div>
+      <input type="password" id="setupPw1" placeholder="رمز عبور">
+      <input type="password" id="setupPw2" placeholder="تکرار رمز عبور">
+      <div class="lock-error" id="setupError"></div>
+      <button class="btn btn-primary btn-block" id="setupSubmit" type="button">تنظیم رمز</button>
+    </div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+    <div><b>سامانه تحویل و امضای دیجیتال</b><span>ورود با کد اختصاصی</span></div>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-ghost btn-sm" id="adminOpenBtn" type="button">ورود مدیر</button>
+    <button class="btn btn-ghost btn-sm" id="adminLogoutBtn" type="button" style="display:none;">خروج مدیر</button>
+  </div>
+</div>
+
+<!-- CODE ENTRY -->
+<section class="view active" id="view-code">
+  <div class="card" style="max-width:420px; margin:40px auto;">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>ورود با کد اختصاصی</h2>
+    <p class="page-sub">کدی که بهت داده شده رو وارد کن</p>
+    <div class="field"><input type="text" id="codeInput" class="code-input" placeholder="------" maxlength="10"></div>
+    <div class="lock-error" id="codeError"></div>
+    <button class="btn btn-primary btn-block" id="codeSubmit" type="button">ورود</button>
+  </div>
+</section>
+
+<!-- PERSON INFO -->
+<section class="view" id="view-info">
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>اطلاعات ثبت‌شده</h2>
+    <p class="page-sub">لطفاً اطلاعات زیر رو بررسی کن و در صورت صحت، تأیید کن</p>
+    <div class="info-grid" id="infoGrid"></div>
+    <button class="btn btn-primary btn-block" id="infoConfirmBtn" type="button">تأیید و ادامه به صفحه امضا</button>
+  </div>
+</section>
+
+<!-- SIGNATURE PAGE -->
+<section class="view" id="view-sign">
+  <div class="sign-half">
+    <div class="sign-half-head">
+      <b>امضای تحویل‌دهنده</b>
+      <span class="sign-confirmed" id="sig1ConfirmedMark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>تأیید شد</span>
+    </div>
+    <div class="sign-canvas-wrap"><canvas id="canvas1"></canvas><div class="sign-hint" id="hint1">اینجا امضا کن</div></div>
+    <div class="sign-actions">
+      <button class="btn btn-ghost btn-sm" id="clear1" type="button">پاک کردن</button>
+      <button class="btn btn-primary btn-sm" id="confirm1" type="button">تأیید امضا</button>
+    </div>
+  </div>
+  <div class="sign-half">
+    <div class="sign-half-head">
+      <b>امضای تحویل‌گیرنده</b>
+      <span class="sign-confirmed" id="sig2ConfirmedMark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>تأیید شد</span>
+    </div>
+    <div class="sign-canvas-wrap"><canvas id="canvas2"></canvas><div class="sign-hint" id="hint2">اینجا امضا کن</div></div>
+    <div class="sign-actions">
+      <button class="btn btn-ghost btn-sm" id="clear2" type="button">پاک کردن</button>
+      <button class="btn btn-primary btn-sm" id="confirm2" type="button">تأیید امضا</button>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <button class="btn btn-primary btn-block" id="generatePdfBtn" type="button" disabled>ساخت سند نهایی (PDF)</button>
+  </div>
+</section>
+
+<!-- DONE -->
+<section class="view" id="view-done">
+  <div class="card" style="text-align:center; max-width:420px; margin:40px auto;">
+    <div style="width:64px;height:64px;border-radius:50%; background:var(--green-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <h2 style="justify-content:center;">سند با موفقیت ساخته شد</h2>
+    <p class="page-sub">می‌تونی سند رو دانلود یا مستقیم پرینت بگیری</p>
+    <button class="btn btn-primary btn-block" id="downloadPdfBtn" type="button">دانلود PDF</button>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="view" id="view-admin">
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0114 0v1"/></svg>افزودن / ویرایش شخص</h2>
+    <input type="hidden" id="editPersonId" value="">
+    <div class="field"><label>نام و نام خانوادگی</label><input type="text" id="pName" placeholder="مثلاً: علی رضایی"></div>
+    <div class="field">
+      <label>فیلدهای اطلاعاتی (کلید / مقدار)</label>
+      <div id="pFieldRows"></div>
+      <button class="btn btn-ghost btn-sm" id="addPFieldRow" type="button">+ افزودن فیلد</button>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-primary btn-block" id="savePersonBtn" type="button">ذخیره شخص</button>
+      <button class="btn btn-ghost" id="cancelPersonEdit" type="button" style="display:none;">انصراف</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>لیست افراد</h2>
+    <div id="peopleList"></div>
+  </div>
+
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4zM9 8v12M15 8v12"/></svg>قالب سند (متن آزاد)</h2>
+    <p class="page-sub">
+      از این متغیرها استفاده کن: <code>{{name}}</code> نام، <code>{{code}}</code> کد، <code>{{date}}</code> تاریخ، <code>{{time}}</code> ساعت، <code>{{docnumber}}</code> شماره سند، <code>{{signature1}}</code> امضای تحویل‌دهنده، <code>{{signature2}}</code> امضای تحویل‌گیرنده، و <code>{{کلید فیلد}}</code> برای هر فیلد اختصاصی که برای شخص تعریف کردی. با نوار ابزار پایین می‌تونی هرجای متن که بخوای عکس (مثلاً لوگو) اضافه کنی، اندازه‌ش رو تغییر بدی، یا یک کادر/حاشیه دور یک بخش بکشی.
+    </p>
+    <div class="rich-toolbar">
+      <button type="button" id="tbBold" title="پررنگ"><b>B</b></button>
+      <button type="button" id="tbItalic" title="کج"><i>I</i></button>
+      <button type="button" id="tbUnderline" title="زیرخط"><u>U</u></button>
+      <div class="sep"></div>
+      <button type="button" id="tbRight">راست‌چین</button>
+      <button type="button" id="tbCenter">وسط‌چین</button>
+      <button type="button" id="tbLeft">چپ‌چین</button>
+      <div class="sep"></div>
+      <button type="button" id="tbAddImage">🖼 افزودن عکس</button>
+      <button type="button" id="tbAddBox">▭ افزودن کادر/حاشیه</button>
+      <div class="sep"></div>
+      <span style="font-size:11px; color:var(--muted); align-self:center;">اندازه‌ی عکس انتخاب‌شده:</span>
+      <button type="button" id="tbImgSmall">کوچک</button>
+      <button type="button" id="tbImgMed">متوسط</button>
+      <button type="button" id="tbImgLarge">بزرگ</button>
+      <button type="button" id="tbImgDelete">حذف عکس</button>
+    </div>
+    <input type="file" id="templateImgInput" accept="image/*" style="display:none;">
+    <div class="field"><div id="templateInput" class="rich-editor" contenteditable="true" placeholder="متن سند رو اینجا بنویس..."></div></div>
+    <button class="btn btn-primary btn-block" id="saveTemplateBtn" type="button">ذخیره قالب</button>
+  </div>
+
+  <div class="card">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 002 2h10a2 2 0 002-2V9"/></svg>بایگانی اسناد</h2>
+    <div id="archiveList"></div>
+  </div>
+</section>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = 'https://skzgywgqvxaxymxtkaka.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_fZmIa94Ru_-CZI3z0yr7ow_m7kXZzTv';
+  var SUPABASE_TABLE = 'kv_store';
+  var K_ADMIN = 'sg-admin';
+  var K_PEOPLE = 'sg-people';
+  var K_TEMPLATE = 'sg-template';
+  var K_COUNTER = 'sg-doc-counter';
+  var K_ARCHIVE = 'sg-archive';
+
+  function supabaseHeaders(extra){
+    var h = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+    if (extra) for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+  var memoryStore = {};
+  var LOCAL_OK = (function(){
+    try{ if (typeof localStorage !== 'undefined'){ localStorage.setItem('__sg_t__','1'); localStorage.removeItem('__sg_t__'); return true; } }catch(e){}
+    return false;
+  })();
+  function fallbackGet(key){
+    try{ if (LOCAL_OK){ var v = localStorage.getItem('sg_' + key); return v ? JSON.parse(v) : null; } }catch(e){}
+    return memoryStore[key] !== undefined ? memoryStore[key] : null;
+  }
+  function fallbackSet(key, value){
+    try{ if (LOCAL_OK){ localStorage.setItem('sg_' + key, JSON.stringify(value)); return; } }catch(e){}
+    memoryStore[key] = value;
+  }
+  function storeGet(key){
+    return fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE + '?key=eq.' + encodeURIComponent(key) + '&select=value', { headers: supabaseHeaders() })
+      .then(function(r){ if (!r.ok) throw new Error('bad'); return r.json(); })
+      .then(function(rows){ return (rows && rows.length) ? rows[0].value : null; })
+      .catch(function(){ return fallbackGet(key); });
+  }
+  function storeSet(key, value){
+    return fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
+      method:'POST',
+      headers: supabaseHeaders({ 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates' }),
+      body: JSON.stringify([{ key:key, value:value, updated_at:new Date().toISOString() }])
+    }).then(function(r){ if(!r.ok) throw new Error('bad'); fallbackSet(key,value); return null; })
+      .catch(function(){ fallbackSet(key,value); return null; });
+  }
+
+  function simpleHash(str){ return btoa(unescape(encodeURIComponent(str || ''))); }
+  function uid(){ return Date.now() + '-' + Math.random().toString(36).slice(2,7); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function genCode(){ return String(Math.floor(100000 + Math.random()*900000)); }
+
+  /* jalali date */
+  var faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return faDigits[d]; }); }
+  var jMonths = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+  function div(a,b){ return Math.floor(a/b); }
+  function gregorianToJalali(gy, gm, gd){
+    var g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    var jy = (gy <= 1600) ? 0 : 979;
+    gy -= (gy <= 1600) ? 621 : 1600;
+    var gy2 = (gm > 2) ? (gy + 1) : gy;
+    var days = (365*gy) + div((gy2+3),4) - div((gy2+99),100) + div((gy2+399),400) - 80 + gd + g_d_m[gm-1];
+    jy += 33 * div(days,12053); days %= 12053;
+    jy += 4 * div(days,1461); days %= 1461;
+    if (days > 365){ jy += div(days-1,365); days = (days-1) % 365; }
+    var jm = (days < 186) ? 1 + div(days,31) : 7 + div(days-186,30);
+    var jd = 1 + ((days < 186) ? (days % 31) : ((days-186) % 30));
+    return [jy, jm, jd];
+  }
+  function nowJalaliDate(){ var d=new Date(); var p=gregorianToJalali(d.getFullYear(),d.getMonth()+1,d.getDate()); return toFa(p[0])+'/'+toFa(String(p[1]).padStart(2,'0'))+'/'+toFa(String(p[2]).padStart(2,'0')); }
+  function nowTime(){ var d=new Date(); return toFa(String(d.getHours()).padStart(2,'0'))+':'+toFa(String(d.getMinutes()).padStart(2,'0')); }
+
+  var state = { admin:{passwordHash:''}, people:[], template:'', counter:0, archive:[], currentPerson:null, sig1:'', sig2:'', pendingArchive:null };
+
+  var toastTimer;
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  var views = ['code','info','sign','done','admin'];
+  function showView(name){
+    views.forEach(function(v){ document.getElementById('view-'+v).classList.remove('active'); });
+    document.getElementById('view-'+name).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  /* ============ Admin lock ============ */
+  var isAdminMode = false;
+  document.getElementById('adminOpenBtn').addEventListener('click', function(){
+    showLock(state.admin && state.admin.passwordHash ? 'login' : 'setup');
+  });
+  document.getElementById('lockCancel').addEventListener('click', function(){ hideLock(); });
+  function showLock(mode){
+    document.getElementById('lockOverlay').style.display = 'flex';
+    if (mode === 'setup'){
+      document.getElementById('lockLoginView').style.display = 'none';
+      document.getElementById('lockSetupView').style.display = 'block';
+      document.getElementById('setupPw1').focus();
+    } else {
+      document.getElementById('lockSetupView').style.display = 'none';
+      document.getElementById('lockLoginView').style.display = 'block';
+      document.getElementById('lockInput').focus();
+    }
+  }
+  function hideLock(){ document.getElementById('lockOverlay').style.display = 'none'; }
+
+  document.getElementById('lockSubmit').addEventListener('click', attemptAdminLogin);
+  document.getElementById('lockInput').addEventListener('keydown', function(ev){ if (ev.key==='Enter') attemptAdminLogin(); });
+  function attemptAdminLogin(){
+    var val = document.getElementById('lockInput').value;
+    if (simpleHash(val) === state.admin.passwordHash){
+      isAdminMode = true;
+      hideLock();
+      document.getElementById('lockInput').value = '';
+      document.getElementById('lockError').textContent = '';
+      enterAdmin();
+    } else {
+      document.getElementById('lockError').textContent = 'رمز اشتباه است';
+    }
+  }
+  document.getElementById('setupSubmit').addEventListener('click', function(){
+    var p1 = document.getElementById('setupPw1').value;
+    var p2 = document.getElementById('setupPw2').value;
+    if (!p1){ document.getElementById('setupError').textContent = 'رمز را وارد کن'; return; }
+    if (p1 !== p2){ document.getElementById('setupError').textContent = 'دو رمز مطابقت ندارند'; return; }
+    state.admin = { passwordHash: simpleHash(p1) };
+    storeSet(K_ADMIN, state.admin).then(function(){
+      isAdminMode = true;
+      hideLock();
+      enterAdmin();
+    });
+  });
+  function enterAdmin(){
+    document.getElementById('adminOpenBtn').style.display = 'none';
+    document.getElementById('adminLogoutBtn').style.display = 'inline-flex';
+    resetPersonForm();
+    renderPeopleList();
+    document.getElementById('templateInput').innerHTML = state.template || '';
+    renderArchiveList();
+    showView('admin');
+  }
+  document.getElementById('adminLogoutBtn').addEventListener('click', function(){
+    isAdminMode = false;
+    document.getElementById('adminOpenBtn').style.display = 'inline-flex';
+    document.getElementById('adminLogoutBtn').style.display = 'none';
+    showView('code');
+  });
+
+  /* ============ Code entry (public) ============ */
+  document.getElementById('codeSubmit').addEventListener('click', attemptCode);
+  document.getElementById('codeInput').addEventListener('keydown', function(ev){ if (ev.key==='Enter') attemptCode(); });
+  function attemptCode(){
+    var code = document.getElementById('codeInput').value.trim();
+    var person = state.people.find(function(p){ return p.code === code; });
+    if (!person){ document.getElementById('codeError').textContent = 'کد نامعتبر است'; return; }
+    document.getElementById('codeError').textContent = '';
+    state.currentPerson = person;
+    renderInfoView(person);
+    showView('info');
+  }
+
+  function renderInfoView(person){
+    var grid = document.getElementById('infoGrid');
+    var html = '<div class="info-box"><span class="k">نام و نام خانوادگی</span><span class="v">' + escapeHtml(person.name) + '</span></div>';
+    (person.fields || []).forEach(function(f){
+      html += '<div class="info-box"><span class="k">' + escapeHtml(f.k) + '</span><span class="v">' + escapeHtml(f.v) + '</span></div>';
+    });
+    grid.innerHTML = html;
+  }
+  document.getElementById('infoConfirmBtn').addEventListener('click', function(){
+    resetSignPage();
+    showView('sign');
+  });
+
+  /* ============ Signature pads ============ */
+  function setupCanvas(canvasId, hintId){
+    var canvas = document.getElementById(canvasId);
+    var ctx = canvas.getContext('2d');
+    function resize(){
+      var rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      ctx.scale(2,2);
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#14274E';
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    var drawing = false;
+    var hasDrawn = false;
+    function pos(ev){
+      var rect = canvas.getBoundingClientRect();
+      var x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+      var y = (ev.touches ? ev.touches[0].clientY : ev.clientY) - rect.top;
+      return { x:x, y:y };
+    }
+    function start(ev){ ev.preventDefault(); drawing = true; hasDrawn = true; document.getElementById(hintId).style.display = 'none'; var p = pos(ev); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+    function move(ev){ if (!drawing) return; ev.preventDefault(); var p = pos(ev); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function end(){ drawing = false; }
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', start, {passive:false});
+    canvas.addEventListener('touchmove', move, {passive:false});
+    canvas.addEventListener('touchend', end);
+    return {
+      clear: function(){ ctx.clearRect(0,0,canvas.width,canvas.height); hasDrawn = false; document.getElementById(hintId).style.display = 'flex'; },
+      isEmpty: function(){ return !hasDrawn; },
+      dataUrl: function(){ return canvas.toDataURL('image/png'); }
+    };
+  }
+  var pad1, pad2;
+  function resetSignPage(){
+    document.getElementById('canvas1').replaceWith(document.getElementById('canvas1').cloneNode());
+    document.getElementById('canvas2').replaceWith(document.getElementById('canvas2').cloneNode());
+    pad1 = setupCanvas('canvas1','hint1');
+    pad2 = setupCanvas('canvas2','hint2');
+    state.sig1 = ''; state.sig2 = '';
+    document.getElementById('sig1ConfirmedMark').style.display = 'none';
+    document.getElementById('sig2ConfirmedMark').style.display = 'none';
+    document.getElementById('confirm1').disabled = false;
+    document.getElementById('confirm2').disabled = false;
+    document.getElementById('generatePdfBtn').disabled = true;
+  }
+  document.getElementById('clear1').addEventListener('click', function(){ pad1.clear(); state.sig1=''; document.getElementById('sig1ConfirmedMark').style.display='none'; document.getElementById('confirm1').disabled=false; document.getElementById('generatePdfBtn').disabled = true; });
+  document.getElementById('clear2').addEventListener('click', function(){ pad2.clear(); state.sig2=''; document.getElementById('sig2ConfirmedMark').style.display='none'; document.getElementById('confirm2').disabled=false; document.getElementById('generatePdfBtn').disabled = true; });
+  document.getElementById('confirm1').addEventListener('click', function(){
+    if (pad1.isEmpty()){ showToast('اول امضا کن'); return; }
+    state.sig1 = pad1.dataUrl();
+    document.getElementById('sig1ConfirmedMark').style.display = 'flex';
+    document.getElementById('confirm1').disabled = true;
+    checkBothSigned();
+  });
+  document.getElementById('confirm2').addEventListener('click', function(){
+    if (pad2.isEmpty()){ showToast('اول امضا کن'); return; }
+    state.sig2 = pad2.dataUrl();
+    document.getElementById('sig2ConfirmedMark').style.display = 'flex';
+    document.getElementById('confirm2').disabled = true;
+    checkBothSigned();
+  });
+  function checkBothSigned(){
+    document.getElementById('generatePdfBtn').disabled = !(state.sig1 && state.sig2);
+  }
+
+  /* ============ Template rendering + PDF ============ */
+  function fillTemplate(tpl, person, docNumber, sig1, sig2){
+    var dateStr = nowJalaliDate();
+    var timeStr = nowTime();
+    var out = tpl; // tpl is already HTML produced by the rich editor — do not escape the whole thing
+    var map = { name: person.name, code: person.code, date: dateStr, time: timeStr, docnumber: toFa(docNumber) };
+    (person.fields || []).forEach(function(f){ map[f.k] = f.v; });
+    out = out.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function(m, key){
+      if (key === 'signature1') return '__SIG1__';
+      if (key === 'signature2') return '__SIG2__';
+      if (map.hasOwnProperty(key)) return escapeHtml(String(map[key]));
+      return '';
+    });
+    out = out.replace(/__SIG1__/g, '<img class="pdf-sig-img" src="' + sig1 + '">');
+    out = out.replace(/__SIG2__/g, '<img class="pdf-sig-img" src="' + sig2 + '">');
+    return out;
+  }
+
+  function buildPdfFromHtml(htmlContent){
+    return new Promise(function(resolve){
+      var box = document.createElement('div');
+      box.className = 'pdf-render-box';
+      box.style.width = '480px';
+      box.innerHTML = htmlContent;
+      document.body.appendChild(box);
+      html2canvas(box, { scale:2, backgroundColor:'#ffffff' }).then(function(canvas){
+        document.body.removeChild(box);
+        var imgData = canvas.toDataURL('image/jpeg', 0.92);
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF({ unit:'mm', format:'a5' });
+        var pageW = pdf.internal.pageSize.getWidth();
+        var pageH = (canvas.height * pageW) / canvas.width;
+        pdf.addImage(imgData, 'JPEG', 0, 0, pageW, Math.min(pageH, pdf.internal.pageSize.getHeight()));
+        resolve(pdf);
+      });
+    });
+  }
+
+  var lastPdf = null;
+  document.getElementById('generatePdfBtn').addEventListener('click', function(){
+    if (!state.sig1 || !state.sig2 || !state.currentPerson) return;
+    var newDocNumber = state.counter + 1;
+    var finalHtml = fillTemplate(state.template || '', state.currentPerson, newDocNumber, state.sig1, state.sig2);
+    buildPdfFromHtml(finalHtml).then(function(pdf){
+      lastPdf = pdf;
+      state.counter = newDocNumber;
+      storeSet(K_COUNTER, state.counter);
+      var archiveEntry = {
+        id: uid(), personId: state.currentPerson.id, personName: state.currentPerson.name,
+        docNumber: newDocNumber, finalHtml: finalHtml, createdAtDisplay: nowJalaliDate() + ' - ' + nowTime()
+      };
+      state.archive.unshift(archiveEntry);
+      storeSet(K_ARCHIVE, state.archive);
+      showView('done');
+    });
+  });
+  document.getElementById('downloadPdfBtn').addEventListener('click', function(){
+    if (lastPdf) lastPdf.save('سند-' + (state.currentPerson ? state.currentPerson.name : 'doc') + '.pdf');
+  });
+
+  /* ============ Admin: people ============ */
+  function addPFieldRow(k,v){
+    var wrap = document.getElementById('pFieldRows');
+    var row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = '<input type="text" class="pf-k" placeholder="کلید (مثلاً: شماره پرسنلی)" value="' + (k?escapeHtml(k):'') + '">'
+      + '<input type="text" class="pf-v" placeholder="مقدار" value="' + (v?escapeHtml(v):'') + '">'
+      + '<button class="btn btn-danger btn-sm" type="button">حذف</button>';
+    row.querySelector('button').addEventListener('click', function(){ row.remove(); });
+    wrap.appendChild(row);
+  }
+  document.getElementById('addPFieldRow').addEventListener('click', function(){ addPFieldRow(); });
+
+  function resetPersonForm(){
+    document.getElementById('editPersonId').value = '';
+    document.getElementById('pName').value = '';
+    document.getElementById('pFieldRows').innerHTML = '';
+    addPFieldRow(); addPFieldRow();
+    document.getElementById('cancelPersonEdit').style.display = 'none';
+  }
+  document.getElementById('cancelPersonEdit').addEventListener('click', resetPersonForm);
+
+  document.getElementById('savePersonBtn').addEventListener('click', function(){
+    var name = document.getElementById('pName').value.trim();
+    if (!name){ showToast('نام رو وارد کن'); return; }
+    var fields = [];
+    document.querySelectorAll('#pFieldRows .stat-row').forEach(function(row){
+      var k = row.querySelector('.pf-k').value.trim();
+      var v = row.querySelector('.pf-v').value.trim();
+      if (k && v) fields.push({ k:k, v:v });
+    });
+    var editId = document.getElementById('editPersonId').value;
+    if (editId){
+      var existing = state.people.find(function(p){ return p.id === editId; });
+      existing.name = name; existing.fields = fields;
+      showToast('اطلاعات به‌روزرسانی شد');
+    } else {
+      state.people.push({ id:uid(), name:name, code:genCode(), fields:fields });
+      showToast('شخص اضافه شد');
+    }
+    storeSet(K_PEOPLE, state.people);
+    resetPersonForm();
+    renderPeopleList();
+  });
+
+  function renderPeopleList(){
+    var wrap = document.getElementById('peopleList');
+    if (!state.people.length){ wrap.innerHTML = '<div style="color:var(--muted); text-align:center; padding:20px;">هنوز شخصی ثبت نشده</div>'; return; }
+    wrap.innerHTML = state.people.map(function(p){
+      return '<div class="person-row" data-id="' + p.id + '"><div class="info"><b>' + escapeHtml(p.name) + '</b><span>' + (p.fields||[]).length + ' فیلد اضافی</span></div>'
+        + '<span class="code-chip">' + p.code + '</span>'
+        + '<div class="row-actions"><button class="btn btn-ghost btn-sm" data-action="edit">ویرایش</button><button class="btn btn-danger btn-sm" data-action="delete">حذف</button></div></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-action="edit"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.person-row').getAttribute('data-id');
+        var p = state.people.find(function(x){ return x.id === id; });
+        document.getElementById('editPersonId').value = p.id;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pFieldRows').innerHTML = '';
+        (p.fields||[]).forEach(function(f){ addPFieldRow(f.k, f.v); });
+        if (!p.fields || !p.fields.length) addPFieldRow();
+        document.getElementById('cancelPersonEdit').style.display = 'inline-flex';
+        window.scrollTo(0,0);
+      });
+    });
+    wrap.querySelectorAll('[data-action="delete"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.person-row').getAttribute('data-id');
+        state.people = state.people.filter(function(x){ return x.id !== id; });
+        storeSet(K_PEOPLE, state.people);
+        renderPeopleList();
+      });
+    });
+  }
+
+  /* ============ Admin: rich template editor ============ */
+  var templateEditor = document.getElementById('templateInput');
+  var selectedImg = null;
+
+  document.getElementById('saveTemplateBtn').addEventListener('click', function(){
+    state.template = templateEditor.innerHTML;
+    storeSet(K_TEMPLATE, state.template);
+    showToast('قالب ذخیره شد');
+  });
+
+  function focusEditor(){ templateEditor.focus(); }
+  document.getElementById('tbBold').addEventListener('click', function(){ focusEditor(); document.execCommand('bold'); });
+  document.getElementById('tbItalic').addEventListener('click', function(){ focusEditor(); document.execCommand('italic'); });
+  document.getElementById('tbUnderline').addEventListener('click', function(){ focusEditor(); document.execCommand('underline'); });
+  document.getElementById('tbRight').addEventListener('click', function(){ focusEditor(); document.execCommand('justifyRight'); });
+  document.getElementById('tbCenter').addEventListener('click', function(){ focusEditor(); document.execCommand('justifyCenter'); });
+  document.getElementById('tbLeft').addEventListener('click', function(){ focusEditor(); document.execCommand('justifyLeft'); });
+
+  document.getElementById('tbAddBox').addEventListener('click', function(){
+    focusEditor();
+    document.execCommand('insertHTML', false, '<div class="tpl-box">متن داخل کادر</div><div><br></div>');
+  });
+
+  document.getElementById('tbAddImage').addEventListener('click', function(){ document.getElementById('templateImgInput').click(); });
+  document.getElementById('templateImgInput').addEventListener('change', function(ev){
+    var file = ev.target.files[0];
+    if (!file) return;
+    var img = new Image();
+    var reader = new FileReader();
+    reader.onload = function(e){
+      img.onload = function(){
+        var maxW = 700;
+        var scale = Math.min(1, maxW / img.width);
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        focusEditor();
+        document.execCommand('insertImage', false, dataUrl);
+        var imgs = templateEditor.querySelectorAll('img');
+        var lastImg = imgs[imgs.length - 1];
+        if (lastImg){ lastImg.style.maxWidth = '220px'; lastImg.style.height = 'auto'; selectImage(lastImg); }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    ev.target.value = '';
+  });
+
+  function selectImage(imgEl){
+    if (selectedImg) selectedImg.classList.remove('img-selected');
+    selectedImg = imgEl;
+    selectedImg.classList.add('img-selected');
+  }
+  templateEditor.addEventListener('click', function(ev){
+    if (ev.target.tagName === 'IMG') selectImage(ev.target);
+  });
+  function applyImgSize(px){
+    if (!selectedImg){ showToast('اول روی یک عکس کلیک کن'); return; }
+    selectedImg.style.maxWidth = px + 'px';
+    selectedImg.style.width = px + 'px';
+  }
+  document.getElementById('tbImgSmall').addEventListener('click', function(){ applyImgSize(120); });
+  document.getElementById('tbImgMed').addEventListener('click', function(){ applyImgSize(220); });
+  document.getElementById('tbImgLarge').addEventListener('click', function(){ applyImgSize(360); });
+  document.getElementById('tbImgDelete').addEventListener('click', function(){
+    if (!selectedImg){ showToast('اول روی یک عکس کلیک کن'); return; }
+    selectedImg.remove();
+    selectedImg = null;
+  });
+
+  /* ============ Admin: archive ============ */
+  function renderArchiveList(){
+    var wrap = document.getElementById('archiveList');
+    if (!state.archive.length){ wrap.innerHTML = '<div style="color:var(--muted); text-align:center; padding:20px;">هنوز سندی ثبت نشده</div>'; return; }
+    wrap.innerHTML = state.archive.map(function(a){
+      return '<div class="archive-row" data-id="' + a.id + '"><div class="info"><b>' + escapeHtml(a.personName) + ' — سند شماره ' + toFa(a.docNumber) + '</b><span>' + a.createdAtDisplay + '</span></div>'
+        + '<button class="btn btn-ghost btn-sm" data-action="redownload">دانلود</button></div>';
+    }).join('');
+    wrap.querySelectorAll('[data-action="redownload"]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.closest('.archive-row').getAttribute('data-id');
+        var a = state.archive.find(function(x){ return x.id === id; });
+        buildPdfFromHtml(a.finalHtml).then(function(pdf){ pdf.save('سند-' + a.personName + '.pdf'); });
+      });
+    });
+  }
+
+  /* ============ Init ============ */
+  function init(){
+    Promise.all([ storeGet(K_ADMIN), storeGet(K_PEOPLE), storeGet(K_TEMPLATE), storeGet(K_COUNTER), storeGet(K_ARCHIVE) ]).then(function(res){
+      state.admin = res[0] || { passwordHash:'' };
+      state.people = res[1] || [];
+      state.template = res[2] || '';
+      state.counter = res[3] || 0;
+      state.archive = res[4] || [];
+    });
+  }
+  init();
+})();
+</script>
+</body>
+</html>
